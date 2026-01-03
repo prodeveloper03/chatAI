@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import com.code.machinecoding.navigation.AppNavHost
 import com.code.machinecoding.ui.theme.MachineCodingTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,16 +18,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MachineCodingTheme {
-                Surface(color = MaterialTheme.colorScheme.background) {
-                    Greeting("Machine Coding Test")
-                }
+                AppNavHost()
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello, $name!")
-}
 
