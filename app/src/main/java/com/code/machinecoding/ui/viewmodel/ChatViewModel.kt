@@ -6,7 +6,9 @@ import com.code.machinecoding.data.repository.ChatRepository
 import com.code.machinecoding.domain.model.ChatMessage
 import com.code.machinecoding.utils.Response
 import com.code.machinecoding.utils.SeedMessages
+import com.code.machinecoding.utils.Sender
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +25,9 @@ class ChatViewModel @Inject constructor(
 
     val messagesState: StateFlow<Response<List<ChatMessage>>> =
         _messagesState.asStateFlow()
+
+    private val _isTyping = MutableStateFlow(false)
+    val isTyping: StateFlow<Boolean> = _isTyping.asStateFlow()
 
     init {
         observeMessages()
@@ -51,6 +56,8 @@ class ChatViewModel @Inject constructor(
 
         viewModelScope.launch {
             repo.sendTextMessage(text.trim())
+            // Simulating AI typing
+            simulateAiTyping()
         }
     }
 
@@ -67,8 +74,24 @@ class ChatViewModel @Inject constructor(
                 thumbnailPath = thumbnailPath,
                 caption = caption
             )
+
+            simulateAiTyping()
         }
     }
+
+    private suspend fun simulateAiTyping() {
+        _isTyping.value = true
+
+       delay(1500)
+
+        repo.sendTextMessage(
+            text = "Thanks for reaching out! 😊",
+            sender = Sender.AGENT
+        )
+
+        _isTyping.value = false
+    }
 }
+
 
 

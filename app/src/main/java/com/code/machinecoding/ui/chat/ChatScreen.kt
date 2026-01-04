@@ -27,6 +27,7 @@ fun ChatScreen(
     onImageClick: (String) -> Unit
 ) {
     val state = viewModel.messagesState.collectAsStateWithLifecycle()
+    val isTyping by viewModel.isTyping.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     var showAttachmentSheet by remember { mutableStateOf(false) }
@@ -88,9 +89,11 @@ fun ChatScreen(
 
     ChatScreenContent(
         state = state.value,
+        isTyping = isTyping,
         onSendText = viewModel::sendTextMessage,
         onAttachClick = { showAttachmentSheet = true },
-        onImageClick = onImageClick
+        onImageClick = onImageClick,
+        snackbarHostState = snackbarHostState
     )
 
     if (showAttachmentSheet) {

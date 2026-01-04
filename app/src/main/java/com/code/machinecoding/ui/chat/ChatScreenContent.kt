@@ -2,6 +2,7 @@ package com.code.machinecoding.ui.chat
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -18,9 +19,11 @@ import com.code.machinecoding.utils.rememberImeBottom
 @Composable
 fun ChatScreenContent(
     state: Response<List<ChatMessage>>,
+    isTyping: Boolean,
     onSendText: (String) -> Unit,
     onAttachClick: () -> Unit,
-    onImageClick: (String) -> Unit
+    onImageClick: (String) -> Unit,
+    snackbarHostState: SnackbarHostState
 ) {
     val listState = rememberLazyListState()
 
@@ -49,6 +52,7 @@ fun ChatScreenContent(
 
                 MessageList(
                     messages = messages,
+                    isTyping = isTyping,
                     listState = listState,
                     onImageClick = onImageClick,
                     modifier = Modifier.weight(1f)

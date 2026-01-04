@@ -13,6 +13,7 @@ import com.code.machinecoding.domain.model.ChatMessage
 @Composable
 fun MessageList(
     messages: List<ChatMessage>,
+    isTyping: Boolean,
     listState: LazyListState,
     onImageClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -25,6 +26,7 @@ fun MessageList(
             vertical = 8.dp
         )
     ) {
+
         items(
             items = messages,
             key = { it.id }
@@ -35,6 +37,19 @@ fun MessageList(
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
+
+        if (isTyping) {
+            item(key = "typing_indicator") {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    TypingIndicator()
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
     }
 }
+
 
