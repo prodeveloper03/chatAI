@@ -5,18 +5,21 @@ import com.code.machinecoding.domain.model.ChatMessage
 import com.code.machinecoding.domain.model.FileMeta
 import com.code.machinecoding.domain.model.Thumbnail
 
-fun MessageEntity.toDomain(): ChatMessage =
-    ChatMessage(
+fun MessageEntity.toDomain(): ChatMessage {
+    val msgType = MessageType.valueOf(type)
+    return ChatMessage(
         id = id,
         message = message,
-        type = MessageType.valueOf(type),
-        file = filePath?.let {
+        type = msgType,
+        file = if (msgType == MessageType.FILE) {
             FileMeta(
-                path = it,
-                fileSize = fileSize ?: 0,
-                thumbnail = thumbnailPath?.let { Thumbnail(it) }
+                path = filePath.orEmpty(),
+                fileSize = fileSize ?: 0L,
+                thumbnail = Thumbnail(thumbnailPath)
             )
-        },
+        } else null,
         sender = Sender.valueOf(sender),
         timestamp = timestamp
     )
+}
+

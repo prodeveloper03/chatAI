@@ -32,12 +32,6 @@ object DatabaseModule {
     fun provideMessageDao(db: ChatDatabase): MessageDao =
         db.messageDao()
 
-    @Provides
-    @Singleton
-    fun provideChatRepository(
-        dao: MessageDao
-    ): ChatRepository =
-        ChatRepository(dao)
 
 
 }
