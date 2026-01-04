@@ -18,29 +18,57 @@ class ChatViewModel @Inject constructor(
     private val repo: ChatRepository
 ) : ViewModel() {
 
-    private val _messagesState = MutableStateFlow<Response<List<ChatMessage>>>(Response.Loading)
-    val messagesState: StateFlow<Response<List<ChatMessage>>> = _messagesState.asStateFlow()
+    private val _messagesState =
+        MutableStateFlow<Response<List<ChatMessage>>>(Response.Loading)
+
+    val messagesState: StateFlow<Response<List<ChatMessage>>> =
+        _messagesState.asStateFlow()
 
     init {
+        observeMessages()
+        seedMessagesIfNeeded()
+    }
+
+    private fun observeMessages() {
         viewModelScope.launch {
-            repo.insertSeedMessagesIfNeeded(SeedMessages.seed())
-            loadMessages()
+            repo.observeMessages()
+                .collect { messages ->
+                    _messagesState.value = Response.Success(messages)
+                }
         }
     }
 
-    fun loadMessages() {
+    private fun seedMessagesIfNeeded() {
         viewModelScope.launch {
-            _messagesState.value = Response.Loading
-            _messagesState.value = repo.loadMessages()
+            repo.insertSeedMessagesIfNeeded(
+                SeedMessages.seed()
+            )
         }
     }
 
     fun sendTextMessage(text: String) {
         if (text.isBlank()) return
+
         viewModelScope.launch {
-            repo.sendTextMessage(text)
-            loadMessages()
+            repo.sendTextMessage(text.trim())
+        }
+    }
+
+    fun sendImageMessage(
+        imagePath: String,
+        fileSize: Long,
+        thumbnailPath: String?,
+        caption: String?
+    ) {
+        viewModelScope.launch {
+            repo.sendFileMessage(
+                imagePath = imagePath,
+                fileSize = fileSize,
+                thumbnailPath = thumbnailPath,
+                caption = caption
+            )
         }
     }
 }
+
 

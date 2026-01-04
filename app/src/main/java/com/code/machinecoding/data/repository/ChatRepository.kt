@@ -10,6 +10,8 @@ import com.code.machinecoding.utils.Response
 import com.code.machinecoding.utils.Sender
 import com.code.machinecoding.utils.toDomain
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
@@ -21,18 +23,12 @@ class ChatRepository @Inject constructor(
 ) {
 
 
-    suspend fun loadMessages(): Response<List<ChatMessage>> {
-        return try {
-            val messages = messageDao
-                .getAllMessages()
-                .map { it.toDomain() }
-
-            Response.Success(messages)
-        } catch (e: Exception) {
-            Response.Error(
-                e.localizedMessage ?: "Unable to load messages"
-            )
-        }
+    fun observeMessages(): Flow<List<ChatMessage>> {
+        return messageDao
+            .observeAllMessages()
+            .map { entities ->
+                entities.map { it.toDomain() }
+            }
     }
 
 
@@ -48,26 +44,19 @@ class ChatRepository @Inject constructor(
     suspend fun sendTextMessage(
         text: String,
         sender: Sender = Sender.USER
-    ): Response<Unit> {
-        return try {
-            val entity = MessageEntity(
-                id = UUID.randomUUID().toString(),
-                message = text,
-                type = MessageType.TEXT.name,
-                filePath = null,
-                fileSize = null,
-                thumbnailPath = null,
-                sender = sender.name,
-                timestamp = System.currentTimeMillis()
-            )
+    ) {
+        val entity = MessageEntity(
+            id = UUID.randomUUID().toString(),
+            message = text,
+            type = MessageType.TEXT.name,
+            filePath = null,
+            fileSize = null,
+            thumbnailPath = null,
+            sender = sender.name,
+            timestamp = System.currentTimeMillis()
+        )
 
-            messageDao.insertMessage(entity)
-            Response.Success(Unit)
-        } catch (e: Exception) {
-            Response.Error(
-                e.localizedMessage ?: "Failed to send text message"
-            )
-        }
+        messageDao.insertMessage(entity)
     }
 
     suspend fun sendFileMessage(
@@ -76,25 +65,19 @@ class ChatRepository @Inject constructor(
         thumbnailPath: String?,
         caption: String?,
         sender: Sender = Sender.USER
-    ): Response<Unit> {
-        return try {
-            val entity = MessageEntity(
-                id = UUID.randomUUID().toString(),
-                message = caption.orEmpty(),
-                type = MessageType.FILE.name,
-                filePath = imagePath,
-                fileSize = fileSize,
-                thumbnailPath = thumbnailPath,
-                sender = sender.name,
-                timestamp = System.currentTimeMillis()
-            )
+    ) {
+        val entity = MessageEntity(
+            id = UUID.randomUUID().toString(),
+            message = caption.orEmpty(),
+            type = MessageType.FILE.name,
+            filePath = imagePath,
+            fileSize = fileSize,
+            thumbnailPath = thumbnailPath,
+            sender = sender.name,
+            timestamp = System.currentTimeMillis()
+        )
 
-            messageDao.insertMessage(entity)
-            Response.Success(Unit)
-        } catch (e: Exception) {
-            Response.Error(
-                e.localizedMessage ?: "Failed to send file message"
-            )
-        }
+        messageDao.insertMessage(entity)
     }
 }
+

@@ -19,10 +19,13 @@ import com.code.machinecoding.domain.model.ChatMessage
 import com.code.machinecoding.utils.formatFileSize
 
 @Composable
-fun ImageMessage(message: ChatMessage) {
+fun ImageMessage(
+    message: ChatMessage,
+    onImageClick: (String) -> Unit
+) {
     val file = message.file ?: return
     val imagePath = file.thumbnail?.path ?: file.path
-    val context = LocalContext.current
+    val fullFilePath = file.path
 
 
     Column {
@@ -33,7 +36,7 @@ fun ImageMessage(message: ChatMessage) {
                 .size(180.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .clickable {
-                    // TODO: open full screen viewer
+                    onImageClick(fullFilePath)
                 },
             contentScale = ContentScale.Crop
         )

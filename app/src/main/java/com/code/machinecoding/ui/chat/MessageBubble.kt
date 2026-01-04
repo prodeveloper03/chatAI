@@ -13,11 +13,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import com.code.machinecoding.domain.model.ChatMessage
 import com.code.machinecoding.utils.MessageType
+import com.code.machinecoding.utils.NavRoutes.IMAGE_VIEWER
 import com.code.machinecoding.utils.Sender
 import com.code.machinecoding.utils.formatTimestamp
 
 @Composable
-fun MessageBubble(message: ChatMessage) {
+fun MessageBubble(
+    message: ChatMessage,
+    onImageClick: (String) -> Unit
+) {
     val isUser = message.sender == Sender.USER
 
     Row(
@@ -27,23 +31,34 @@ fun MessageBubble(message: ChatMessage) {
         Column(
             modifier = Modifier
                 .background(
-                    color = if (isUser) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.surfaceVariant,
+                    color = if (isUser)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.surfaceVariant,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .padding(12.dp)
                 .widthIn(max = 280.dp)
         ) {
-            if (message.type == MessageType.TEXT) {
-                Text(
-                    text = message.message,
-                    color = if (isUser) Color.White else Color.Black
-                )
-            } else {
-                ImageMessage(message)
+
+            when (message.type) {
+                MessageType.TEXT -> {
+                    Text(
+                        text = message.message,
+                        color = Color.White
+                    )
+                }
+
+                MessageType.FILE -> {
+                    ImageMessage(
+                        message = message,
+                        onImageClick = onImageClick
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(4.dp))
+
             Text(
                 text = formatTimestamp(message.timestamp),
                 fontSize = 10.sp,
