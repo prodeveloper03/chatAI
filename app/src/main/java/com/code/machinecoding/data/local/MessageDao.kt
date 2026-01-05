@@ -20,4 +20,12 @@ interface MessageDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessages(messages: List<MessageEntity>)
+
+    @Query("""
+    SELECT * FROM messages
+    ORDER BY timestamp ASC
+    LIMIT :limit OFFSET :offset
+""")
+    suspend fun getMessagesPaged(limit: Int, offset: Int): List<MessageEntity>
+
 }

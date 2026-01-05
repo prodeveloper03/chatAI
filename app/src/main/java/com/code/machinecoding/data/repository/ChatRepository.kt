@@ -79,5 +79,11 @@ class ChatRepository @Inject constructor(
 
         messageDao.insertMessage(entity)
     }
+
+    suspend fun loadMessagesPaged(offset: Int, limit: Int): List<ChatMessage> {
+        return messageDao
+            .getMessagesPaged(limit = limit, offset = offset)
+            .map { it.toDomain() }
+    }
 }
 

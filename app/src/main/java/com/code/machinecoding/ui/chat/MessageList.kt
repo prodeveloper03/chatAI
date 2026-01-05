@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.code.machinecoding.domain.model.ChatMessage
@@ -16,20 +17,18 @@ fun MessageList(
     isTyping: Boolean,
     listState: LazyListState,
     onImageClick: (String) -> Unit,
+    onLoadMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
         state = listState,
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(
-            horizontal = 12.dp,
-            vertical = 8.dp
-        )
+        reverseLayout = false,
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
     ) {
-
         items(
             items = messages,
-            key = { it.id }
+            key = { it.id + it.timestamp }
         ) { message ->
             MessageBubble(
                 message = message,
@@ -49,7 +48,20 @@ fun MessageList(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
+
+        if (messages.isNotEmpty()) {
+            item {
+                LaunchedEffect(messages.first().id) {
+                    val firstVisible = listState.layoutInfo.visibleItemsInfo.firstOrNull()?.index
+                    if (firstVisible == 0) {
+                        onLoadMore()
+                    }
+                }
+            }
+        }
     }
 }
+
+
 
 

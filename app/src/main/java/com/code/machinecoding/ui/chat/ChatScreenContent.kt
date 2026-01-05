@@ -23,7 +23,8 @@ fun ChatScreenContent(
     onSendText: (String) -> Unit,
     onAttachClick: () -> Unit,
     onImageClick: (String) -> Unit,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    onLoadMore: () -> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -55,7 +56,8 @@ fun ChatScreenContent(
                     isTyping = isTyping,
                     listState = listState,
                     onImageClick = onImageClick,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    onLoadMore = onLoadMore
                 )
 
                 MessageInputBar(

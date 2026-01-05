@@ -22,23 +22,29 @@ class ChatViewModel @Inject constructor(
 
     private val _messagesState =
         MutableStateFlow<Response<List<ChatMessage>>>(Response.Loading)
-
-    val messagesState: StateFlow<Response<List<ChatMessage>>> =
-        _messagesState.asStateFlow()
+    val messagesState: StateFlow<Response<List<ChatMessage>>> = _messagesState.asStateFlow()
 
     private val _isTyping = MutableStateFlow(false)
     val isTyping: StateFlow<Boolean> = _isTyping.asStateFlow()
+    private val loadedMessages = mutableListOf<ChatMessage>()
+    private var offset = 0
+    private val pageSize = 15
+    var allMessagesLoaded = false
+        private set
 
     init {
         observeMessages()
         seedMessagesIfNeeded()
+        loadMoreMessages()
     }
 
     private fun observeMessages() {
         viewModelScope.launch {
             repo.observeMessages()
                 .collect { messages ->
-                    _messagesState.value = Response.Success(messages)
+                    loadedMessages.clear()
+                    loadedMessages.addAll(messages)
+                    _messagesState.value = Response.Success(loadedMessages.toList())
                 }
         }
     }
@@ -51,12 +57,27 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun loadMoreMessages() {
+        if (allMessagesLoaded) return
+
+        viewModelScope.launch {
+            val page = repo.loadMessagesPaged(offset, pageSize)
+            if (page.isEmpty()) {
+                allMessagesLoaded = true
+                return@launch
+            }
+
+            loadedMessages.addAll(0, page)
+            _messagesState.value = Response.Success(loadedMessages.toList())
+            offset += page.size
+        }
+    }
+
     fun sendTextMessage(text: String) {
         if (text.isBlank()) return
 
         viewModelScope.launch {
             repo.sendTextMessage(text.trim())
-            // Simulating AI typing
             simulateAiTyping()
         }
     }
@@ -74,24 +95,21 @@ class ChatViewModel @Inject constructor(
                 thumbnailPath = thumbnailPath,
                 caption = caption
             )
-
             simulateAiTyping()
         }
     }
 
     private suspend fun simulateAiTyping() {
         _isTyping.value = true
-
-       delay(1500)
-
+        delay(1500)
         repo.sendTextMessage(
             text = "Thanks for reaching out! 😊",
             sender = Sender.AGENT
         )
-
         _isTyping.value = false
     }
 }
+
 
 
 

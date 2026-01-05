@@ -93,7 +93,8 @@ fun ChatScreen(
         onSendText = viewModel::sendTextMessage,
         onAttachClick = { showAttachmentSheet = true },
         onImageClick = onImageClick,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        onLoadMore = {viewModel.loadMoreMessages()}
     )
 
     if (showAttachmentSheet) {
