@@ -1,6 +1,7 @@
 package com.code.machinecoding.ui.chat
 
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.code.machinecoding.domain.model.ChatMessage
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageList(
     messages: List<ChatMessage>,
@@ -29,13 +31,16 @@ fun MessageList(
             items = messages,
             key = { it.id + it.timestamp }
         ) { message ->
-            MessageBubble(
-                message = message,
-                onImageClick = onImageClick
-            )
+
+            Box(modifier = Modifier.animateItemPlacement()) {
+                MessageBubble(
+                    message = message,
+                    onImageClick = onImageClick
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
         }
-
 
         if (isTyping) {
             item(key = "typing_indicator") {
@@ -59,9 +64,13 @@ fun MessageList(
                 }
             }
         }
-
     }
 
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.lastIndex)
+        }
+    }
 }
 
 

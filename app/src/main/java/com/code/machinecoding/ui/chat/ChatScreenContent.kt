@@ -80,13 +80,6 @@ fun ChatScreenContent(
             listState.animateScrollToItem(messages.lastIndex)
         }
     }
-
-    // Auto-scroll for new messages only if user is at bottom
-    LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty() && isUserAtBottom) {
-            listState.animateScrollToItem(messages.lastIndex)
-        }
-    }
 }
 
 
