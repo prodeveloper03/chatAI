@@ -34,9 +34,18 @@ fun FullScreenImageViewer(
     var scale by remember { mutableStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
 
+    val minScale = 1f
+    val maxScale = 5f
+
     val transformState = rememberTransformableState { zoomChange, panChange, _ ->
-        scale = (scale * zoomChange).coerceIn(1f, 5f)
-        offset += panChange
+        val newScale = (scale * zoomChange).coerceIn(minScale, maxScale)
+        if (newScale > minScale) {
+            offset += panChange
+        } else {
+            offset = Offset.Zero
+        }
+
+        scale = newScale
     }
 
     Box(
@@ -48,6 +57,7 @@ fun FullScreenImageViewer(
         AsyncImage(
             model = imagePath,
             contentDescription = null,
+            contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer {
@@ -60,16 +70,15 @@ fun FullScreenImageViewer(
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onDoubleTap = {
-                            if (scale > 1f) {
-                                scale = 1f
+                            if (scale > minScale) {
+                                scale = minScale
                                 offset = Offset.Zero
                             } else {
                                 scale = 2f
                             }
                         }
                     )
-                },
-            contentScale = ContentScale.Fit
+                }
         )
 
         IconButton(
