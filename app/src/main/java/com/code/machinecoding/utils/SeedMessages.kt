@@ -31,7 +31,7 @@ object SeedMessages {
             val isUser = i % 2 == 1
             MessageEntity(
                 id = id,
-                message = if (isUser) "User follow-up message #$i" else "Agent reply message #$i",
+                message = if (isUser) "User follow-up message " else "Agent reply message ",
                 type = "TEXT",
                 filePath = null,
                 fileSize = null,
