@@ -30,12 +30,11 @@ fun ChatScreenContent(
 
     val messages = (state as? Response.Success)?.data.orEmpty()
     val imeBottom = rememberImeBottom()
-
-    val isNearBottom by remember {
+    val isUserAtBottom by remember {
         derivedStateOf {
-            val lastVisible =
-                listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-            lastVisible != null && lastVisible >= messages.lastIndex - 1
+            val lastVisibleIndex =
+                listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            lastVisibleIndex >= messages.lastIndex - 1
         }
     }
 
@@ -46,18 +45,15 @@ fun ChatScreenContent(
     ) {
         when (state) {
             is Response.Loading -> LoadingView()
-
             is Response.Error -> ErrorView(state.message)
-
             is Response.Success -> {
-
                 MessageList(
                     messages = messages,
                     isTyping = isTyping,
                     listState = listState,
                     onImageClick = onImageClick,
-                    modifier = Modifier.weight(1f),
-                    onLoadMore = onLoadMore
+                    onLoadMore = onLoadMore,
+                    modifier = Modifier.weight(1f)
                 )
 
                 MessageInputBar(
@@ -71,27 +67,29 @@ fun ChatScreenContent(
         }
     }
 
-    // When user open the chat keep the latest message visible
-    LaunchedEffect(imeBottom) {
-        if (
-            imeBottom > 0 &&
-            messages.isNotEmpty() &&
-            isNearBottom
-        ) {
+    // Initial load: scroll instantly to bottom
+    LaunchedEffect(messages) {
+        if (messages.isNotEmpty() && listState.firstVisibleItemIndex == 0) {
             listState.scrollToItem(messages.lastIndex)
         }
     }
 
-    // When new message arrives - auto scroll
+    // Scroll to bottom when keyboard opens
+    LaunchedEffect(imeBottom) {
+        if (imeBottom > 0 && messages.isNotEmpty() && isUserAtBottom) {
+            listState.animateScrollToItem(messages.lastIndex)
+        }
+    }
+
+    // Auto-scroll for new messages only if user is at bottom
     LaunchedEffect(messages.size) {
-        if (
-            messages.isNotEmpty() &&
-            isNearBottom
-        ) {
+        if (messages.isNotEmpty() && isUserAtBottom) {
             listState.animateScrollToItem(messages.lastIndex)
         }
     }
 }
+
+
 
 
 

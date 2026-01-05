@@ -23,7 +23,6 @@ fun MessageList(
     LazyColumn(
         state = listState,
         modifier = modifier.fillMaxWidth(),
-        reverseLayout = false,
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
     ) {
         items(
@@ -36,6 +35,7 @@ fun MessageList(
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
+
 
         if (isTyping) {
             item(key = "typing_indicator") {
@@ -59,8 +59,12 @@ fun MessageList(
                 }
             }
         }
+
     }
+
 }
+
+
 
 
 

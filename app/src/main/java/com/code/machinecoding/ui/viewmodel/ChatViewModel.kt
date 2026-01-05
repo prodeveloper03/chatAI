@@ -108,6 +108,8 @@ class ChatViewModel @Inject constructor(
         )
         _isTyping.value = false
     }
+
+
 }
 
 

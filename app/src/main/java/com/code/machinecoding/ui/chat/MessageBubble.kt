@@ -50,7 +50,7 @@ fun MessageBubble(
                 .padding(12.dp)
                 .widthIn(max = 280.dp)
                 .combinedClickable(
-                    onClick = {  },
+                    onClick = {},
                     onLongClick = {
                         if (message.type == MessageType.TEXT) {
                             clipboardManager.setText(AnnotatedString(message.message))
