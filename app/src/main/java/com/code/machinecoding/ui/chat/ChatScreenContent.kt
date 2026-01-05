@@ -1,6 +1,7 @@
 package com.code.machinecoding.ui.chat
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -8,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import com.code.machinecoding.domain.model.ChatMessage
 import com.code.machinecoding.ui.common.ErrorView
@@ -26,7 +28,7 @@ fun ChatScreenContent(
     snackbarHostState: SnackbarHostState,
     onLoadMore: () -> Unit
 ) {
-    val listState = rememberLazyListState()
+    val listState = rememberSaveable(saver = LazyListState.Saver) { LazyListState() }
 
     val messages = (state as? Response.Success)?.data.orEmpty()
     val imeBottom = rememberImeBottom()
@@ -67,9 +69,9 @@ fun ChatScreenContent(
         }
     }
 
-    // Initial load: scroll instantly to bottom
+
     LaunchedEffect(messages) {
-        if (messages.isNotEmpty() && listState.firstVisibleItemIndex == 0) {
+        if (messages.isNotEmpty()) {
             listState.scrollToItem(messages.lastIndex)
         }
     }
@@ -81,6 +83,7 @@ fun ChatScreenContent(
         }
     }
 }
+
 
 
 
