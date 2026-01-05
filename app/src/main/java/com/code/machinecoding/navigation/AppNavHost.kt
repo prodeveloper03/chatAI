@@ -35,6 +35,8 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 @Composable
 fun AppNavHost() {
 
+    val NAV_ANIM_DURATION = 500
+    val NAV_POP_ANIM_DURATION = 400
 
     HideStatusBar()
     val navController = rememberNavController()
@@ -47,29 +49,40 @@ fun AppNavHost() {
             slideInHorizontally(
                 initialOffsetX = { it },
                 animationSpec = tween(
-                    durationMillis = 300,
+                    durationMillis = NAV_ANIM_DURATION,
                     easing = FastOutSlowInEasing
                 )
-            )
+            ) + fadeIn(tween(NAV_ANIM_DURATION))
         },
+
         exitTransition = {
             slideOutHorizontally(
                 targetOffsetX = { -it / 4 },
-                animationSpec = tween(300)
-            ) + fadeOut(tween(300))
+                animationSpec = tween(
+                    durationMillis = NAV_ANIM_DURATION,
+                    easing = FastOutSlowInEasing
+                )
+            ) + fadeOut(tween(NAV_ANIM_DURATION))
         },
 
         popEnterTransition = {
             slideInHorizontally(
                 initialOffsetX = { -it / 4 },
-                animationSpec = tween(300)
-            ) + fadeIn(tween(300))
+                animationSpec = tween(
+                    durationMillis = NAV_POP_ANIM_DURATION,
+                    easing = FastOutSlowInEasing
+                )
+            ) + fadeIn(tween(NAV_POP_ANIM_DURATION))
         },
+
         popExitTransition = {
             slideOutHorizontally(
                 targetOffsetX = { it },
-                animationSpec = tween(300)
-            )
+                animationSpec = tween(
+                    durationMillis = NAV_POP_ANIM_DURATION,
+                    easing = FastOutSlowInEasing
+                )
+            ) + fadeOut(tween(NAV_POP_ANIM_DURATION))
         }
     ) {
 
@@ -122,4 +135,6 @@ fun AppNavHost() {
 
     }
 }
+
+
 
